@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Home Page{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block navbar %}
+<div class="header-container">
+    <header class="navbar-logo">
+        <h1>Lost and Found</h1>
+    </header>
+    <nav>
+        <ul class="navtabs">
+            <li><a class="navlink" href="{% url 'home_page:home' %}">Home</a></li>
+            <li><a class="navlink" href="{% url 'home_page:about' %}">About</a></li>
+            <li><a class="navlink" href="{% url 'home_page:contact' %}">Contact</a></li>
+        </ul>
+    </nav> 
+</div>
+{% endblock %}
+
+
+
+{% block content %}
+<div class="body-container">
+        <div class="welcome-message">
+            <p>Every lost thing carries a story — and every story deserves a way home. Build the bridge that reconnects people with what they thought was gone.</p>
+        </div>
+        <div class="action-btns">
+        <div>
+            <button class="button-31 report-lost" data-bs-toggle="modal" data-bs-target="#lostItemModal">Report Lost Item</button>
+        </div>
+        <div>
+            <button class="button-31 report-found">Report Found Item</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="lostItemModal" tabindex="-1" aria-labelledby="lostItemModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="lostItemModalLabel">Lost Item Report</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="lostItemForm" enctype="multipart/form-data">
+                    <!-- Item Information -->
+                    <div class="section-title mb-3">
+                        <h6>1. Item Information</h6>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="itemName" class="form-label">Item Name/Title *</label>
+                            <input type="text" class="form-control" id="itemName" name="item-name" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="category" class="form-label">Category *</label>
+                            <select class="form-select" id="category" name="category" required>
+                                <option value="">Select Category</option>
+                                <option value="electronics">Electronics</option>
+                                <option value="clothing">Clothing</option>
+                                <option value="documents">Documents</option>
+                                <option value="accessories">Accessories</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="dateLost" class="form-label">Date Lost *</label>
+                            <input type="date" class="form-control" id="dateLost" name="date-lost" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="timeLost" class="form-label">Time Lost (Optional)</label>
+                            <input type="time" class="form-control" id="timeLost" name="time-lost">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="locationLost" class="form-label">Location Lost *</label>
+                        <input type="text" class="form-control" id="locationLost" name="location-lost" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description *</label>
+                        <textarea class="form-control" id="description" rows="3" name="description" placeholder="Color, brand, distinguishing features, contents, etc." required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="itemImage" class="form-label">Image Upload (Optional)</label>
+                        <input type="file" class="form-control" id="itemImage" name="item-image" accept="image/*">
+                    </div>
+
+                    <!-- Contact Information -->
+                    <div class="section-title mb-3 mt-4">
+                        <h6>2. Contact Information</h6>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="fullName" class="form-label">Full Name *</label>
+                            <input type="text" class="form-control" id="fullName" name="fullname" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="email" class="form-label">Email Address *</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="phone" class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" id="phone" name="phone" pattern="[0-9]{11}" placeholder="09676877741" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="contactMethod" class="form-label">Preferred Contact Method *</label>
+                            <select class="form-select" id="contactMethod" name="contact-method" required>
+                                <option value="email">Email</option>
+                                <option value="phone">Phone</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Additional Verification Info -->
+                    <!-- <div class="section-title mb-3 mt-4">
+                        <h6>3. Additional Verification Info</h6>
+                    </div>
+                    <div class="mb-3">
+                        <label for="proofOfOwnership" class="form-label">Proof of Ownership (Optional)</label>
+                        <input type="file" class="form-control" id="proofOfOwnership" name="proof_file">
+                    </div>
+                    <div class="mb-3">
+                        <label for="referenceNumber" class="form-label">Lost Report Reference Number (Optional)</label>
+                        <input type="text" class="form-control" id="referenceNumber" name="reference-number" placeholder="If applicable">
+                    </div>
+
+                    <div class="section-title mb-3 mt-4">
+                        <h6>4. Confirmation</h6>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="confirmAccuracy" required>
+                        <label class="form-check-label" for="confirmAccuracy">
+                            I confirm that the above information is accurate to the best of my knowledge.
+                        </label>
+                    </div> -->
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" form="lostItemForm" class="btn btn-color" id="submit-btn">Submit Report</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{% static 'js/home.js' %}"></script>
+{% endblock %}

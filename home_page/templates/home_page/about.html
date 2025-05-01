@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}About Page{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+<link rel="stylesheet" href="{% static 'css/about.css' %}">
+{% endblock %}
+
+{% block navbar %}
+<div class="header-container">
+    <header class="navbar-header">
+        <h1>Lost and Found</h1>
+    </header>
+    <nav>
+        <ul class="navtabs">
+            <li><a class="navlink" href="{% url 'home_page:home' %}">Home</a></li>
+            <li><a class="navlink" href="{% url 'home_page:about' %}">About</a></li>
+            <li><a class="navlink" href="{% url 'home_page:contact' %}">Contact</a></li>
+        </ul>
+    </nav>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="responsive-container-block bigContainer">
+    <div class="responsive-container-block Container">
+      <img class="mainImg" src="https://workik-widget-assets.s3.amazonaws.com/widget-assets/images/eaboutus1.svg">
+      <div class="allText aboveText">
+        <p class="text-blk headingText">
+          Our Mission
+        </p>
+        <p class="text-blk subHeadingText">
+            Reuniting People with What Matters Most
+        </p>
+        <p class="text-blk description">
+            We aim to provide a reliable and user-friendly platform that empowers individuals and organizations to report, track, and recover lost or found items with ease. Through secure processes and community collaboration, we help bridge the gap between loss and recovery — quickly, ethically, and efficiently.
+        </p>
+        <button class="explore">
+          Explore
+        </button>
+      </div>
+    </div>
+    <div class="responsive-container-block Container bottomContainer">
+      <img class="mainImg" src="https://workik-widget-assets.s3.amazonaws.com/widget-assets/images/xpraup2.svg">
+      <div class="allText bottomText">
+        <p class="text-blk headingText">
+          Our Vision
+        </p>
+        <p class="text-blk subHeadingText">
+            A World Where Nothing Valuable Stays Lost
+        </p>
+        <p class="text-blk description">
+            Our vision is to become the go-to digital solution for lost and found management — across campuses, cities, and institutions. We envision a connected world where every lost item has a path back to its rightful owner, driven by technology, trust, and compassion.
+        </p>
+        <button class="explore">
+          Explore
+        </button>
+      </div>
+    </div>
+  </div>
+{% endblock %}
