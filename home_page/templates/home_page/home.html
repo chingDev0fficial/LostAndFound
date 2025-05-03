@@ -35,7 +35,7 @@
             <button class="button-31 report-lost" data-bs-toggle="modal" data-bs-target="#lostItemModal">Report Lost Item</button>
         </div>
         <div>
-            <button class="button-31 report-found">Report Found Item</button>
+            <button class="button-31 report-found" data-bs-toggle="modal" data-bs-target="#foundItemModal">Report Found Item</button>
         </div>
     </div>
 </div>
@@ -62,12 +62,20 @@
                         <div class="col-md-6 mb-3">
                             <label for="category" class="form-label">Category *</label>
                             <select class="form-select" id="category" name="category" required>
-                                <option value="">Select Category</option>
-                                <option value="electronics">Electronics</option>
-                                <option value="clothing">Clothing</option>
-                                <option value="documents">Documents</option>
-                                <option value="accessories">Accessories</option>
-                                <option value="other">Other</option>
+                                <option value="" disabled selected>Select an item category</option>
+                                <option value="stationery">Stationery (pens, pencils, etc.)</option>
+                                <option value="notebooks">Notebooks / Textbooks</option>
+                                <option value="bags">Bags / Backpacks</option>
+                                <option value="clothing">Clothing (jackets, hoodies, uniforms)</option>
+                                <option value="footwear">Footwear (shoes, sandals)</option>
+                                <option value="water_bottle">Water Bottles</option>
+                                <option value="lunch_box">Lunch Boxes</option>
+                                <option value="eyeglasses">Eyeglasses</option>
+                                <option value="electronics">Electronics (phones, earbuds, USB drives)</option>
+                                <option value="sports_equipment">Sports Equipment</option>
+                                <option value="art_supplies">Art Supplies</option>
+                                <option value="accessories">Accessories (watches, jewelry)</option>
+                                <option value="id_cards">ID Cards / Bus Passes</option>
                             </select>
                         </div>
                     </div>
@@ -113,42 +121,122 @@
                             <label for="phone" class="form-label">Phone Number</label>
                             <input type="tel" class="form-control" id="phone" name="phone" pattern="[0-9]{11}" placeholder="09676877741" required>
                         </div>
-                        <div class="col-md-6 mb-3">
+                        <!-- <div class="col-md-6 mb-3">
                             <label for="contactMethod" class="form-label">Preferred Contact Method *</label>
                             <select class="form-select" id="contactMethod" name="contact-method" required>
                                 <option value="email">Email</option>
                                 <option value="phone">Phone</option>
                             </select>
-                        </div>
+                        </div> -->
                     </div>
-
-                    <!-- Additional Verification Info -->
-                    <!-- <div class="section-title mb-3 mt-4">
-                        <h6>3. Additional Verification Info</h6>
-                    </div>
-                    <div class="mb-3">
-                        <label for="proofOfOwnership" class="form-label">Proof of Ownership (Optional)</label>
-                        <input type="file" class="form-control" id="proofOfOwnership" name="proof_file">
-                    </div>
-                    <div class="mb-3">
-                        <label for="referenceNumber" class="form-label">Lost Report Reference Number (Optional)</label>
-                        <input type="text" class="form-control" id="referenceNumber" name="reference-number" placeholder="If applicable">
-                    </div>
-
-                    <div class="section-title mb-3 mt-4">
-                        <h6>4. Confirmation</h6>
-                    </div>
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="confirmAccuracy" required>
-                        <label class="form-check-label" for="confirmAccuracy">
-                            I confirm that the above information is accurate to the best of my knowledge.
-                        </label>
-                    </div> -->
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <button type="submit" form="lostItemForm" class="btn btn-color" id="submit-btn">Submit Report</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Found Item Modal -->
+<div class="modal fade" id="foundItemModal" tabindex="-1" aria-labelledby="foundItemModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="foundItemModalLabel">Report Found Item</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="foundItemForm" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <!-- Item Image -->
+                    <div class="section-title mb-3">
+                        <h6>1. Item Image</h6>
+                    </div>
+                    <div class="mb-3">
+                        <label for="itemImage" class="form-label">Upload Image *</label>
+                        <input type="file" class="form-control" id="itemImage" name="item-image" 
+                               accept="image/*" required onchange="predictCategory(this)">
+                        <div id="imagePreview" class="mt-2"></div>
+                    </div>
+
+                    <!-- Suggested Category -->
+                    <div class="section-title mb-3">
+                        <h6>2. Category</h6>
+                    </div>
+                    <div class="mb-3">
+                        <label for="predictedCategory" class="form-label">Predicted Category</label>
+                        <select class="form-select" id="predictedCategory" name="predicted-category" required>
+                            <option value="">Analyzing image...</option>
+                            <option value="electronics">Electronics</option>
+                            <option value="clothing">Clothing</option>
+                            <option value="documents">Documents</option>
+                            <option value="accessories">Accessories</option>
+                            <option value="other">Other</option>
+                        </select>
+                        <div id="mlConfidence" class="form-text"></div>
+                    </div>
+
+                    <!-- Item Details -->
+                    <div class="section-title mb-3">
+                        <h6>3. Item Details</h6>
+                    </div>
+                    <div class="mb-3">
+                        <label for="itemName" class="form-label">Item Name</label>
+                        <input type="text" class="form-control" id="itemName" name="item-name">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="locationFound" class="form-label">Location Found *</label>
+                            <input type="text" class="form-control" id="locationFound" name="location-found" required>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="dateFound" class="form-label">Date Found *</label>
+                            <input type="date" class="form-control" id="dateFound" name="date-found" required>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="timeFound" class="form-label">Time Found *</label>
+                            <input type="time" class="form-control" id="timeFound" name="time-found" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                    </div>
+
+                    <!-- Finder's Information -->
+                    <div class="section-title mb-3">
+                        <h6>4. Finder's Information</h6>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="finderName" class="form-label">Full Name *</label>
+                            <input type="text" class="form-control" id="finderName" name="finder-name" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="finderEmail" class="form-label">Email *</label>
+                            <input type="email" class="form-control" id="finderEmail" name="finder-email" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="finderPhone" class="form-label">Phone</label>
+                        <input type="tel" class="form-control" id="finderPhone" name="finder-phone">
+                    </div>
+
+                    <!-- Confirmation -->
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="confirmPossession" required>
+                        <label class="form-check-label" for="confirmPossession">
+                            I confirm this item is in my possession and I'm reporting it in good faith.
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" form="foundItemForm" class="btn btn-color">Submit Report</button>
             </div>
         </div>
     </div>
