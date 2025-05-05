@@ -14,11 +14,6 @@ class LostItem(models.Model):
     full_name = models.CharField(max_length=100)
     email = models.EmailField()
     phone = models.CharField(max_length=15, blank=True)
-    # preferred_contact = models.CharField(max_length=10)
-    
-    # Additional Verification
-    # proof_of_ownership = models.FileField(upload_to='proofs/', null=True, blank=True)
-    # reference_number = models.CharField(max_length=50, blank=True)
     
     created_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=20, default='pending')

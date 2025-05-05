@@ -8,4 +8,6 @@ urlpatterns = [
     path('about/', views.about, name='about'),
     path('contact/', views.contact, name='contact'),
     path('submit-lost-item/', views.item_lost_report),
+    path('recognize-image/', views.recognize_image),
+    path('submit-found-item/', views.item_found_report)
 ]

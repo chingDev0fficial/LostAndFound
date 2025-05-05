@@ -1,5 +1,5 @@
 from .models import LostItem, FoundItem
-from .ml_services import send_match_notification, ItemMatcher
+from .ml_services import send_match_notification, ItemMatcher, load_model
 from django.views.decorators.csrf import csrf_exempt
 from sentence_transformers import SentenceTransformer
 
@@ -8,10 +8,13 @@ def process_lost_item(request):
     """
     Function to handle the lost item report.
     """
+
     # Logic for reporting a lost item
     # Handle file uploads
     try:
         item_image = request.FILES.get('item-image')
+
+        print(request.POST.get('location-lost'))
         
         # Create new lost item record
         lost_item = LostItem(
@@ -19,15 +22,14 @@ def process_lost_item(request):
             category=request.POST.get('category'),
             date_lost=request.POST.get('date-lost'),
             time_lost=request.POST.get('time-lost'),
-            location=request.POST.get('location'),
+            location=request.POST.get('location-lost'),
             description=request.POST.get('description'),
             image=item_image if item_image else None,
             
             # Contact info
-            full_name=request.POST.get('full-name'),
+            full_name=request.POST.get('fullname'),
             email=request.POST.get('email'),
-            phone=request.POST.get('phone'),
-            # preferred_contact=request.POST.get('contact-method')
+            phone=request.POST.get('phone')
         )
         lost_item.save()
 
@@ -64,6 +66,7 @@ def process_found_item(request):
     """
     Function to handle the found item report.
     """
+
     # Logic for reporting a found item
     # Handle file uploads
     try:

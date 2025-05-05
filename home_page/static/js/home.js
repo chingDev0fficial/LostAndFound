@@ -49,22 +49,35 @@ function predictCategory(input) {
         const formData = new FormData();
         formData.append('image', file);
 
+        // Show loading state
+        const category = document.getElementById('predictedCategory');
+        category.value = '';
+        document.getElementById('mlConfidence-cat').textContent = 'Analyzing image...';
+
+        const item = document.getElementById('foundItemName');
+        item.value = ''
+        document.getElementById('mlConfidence-item').textContent = 'Analyzing image...';
         // Simulate ML prediction (replace with actual ML endpoint)
-        setTimeout(() => {
-            const prediction = {
-                category: 'wallet',
-                confidence: 0.92
-            };
-            
-            // Update UI with prediction
-            document.getElementById('predictedCategory').value = prediction.category;
-            document.getElementById('mlConfidence').textContent = 
-                `Confidence: ${(prediction.confidence * 100).toFixed(1)}%`;
-            
-            // Suggest item name based on prediction
-            document.getElementById('itemName').value = 
-                `${prediction.category.charAt(0).toUpperCase() + prediction.category.slice(1)}`;
-        }, 1000);
+        $.ajax({
+            url: 'recognize-image/',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+
+                // console.log(response)
+
+                category.value = `${response.category[0]}`
+                document.getElementById('mlConfidence-cat').textContent = `${(response.category[1] * 100).toFixed(1)}%`
+                item.value = `${response.item[0]}`
+                document.getElementById('mlConfidence-item').textContent = `${(response.item[1] * 100).toFixed(1)}%`
+            },
+            error: function(xhs, status, error) {
+                console.error('Error:', error);
+                alert('Error submitting report. Please try again.');
+            }
+        })
     }
 }
 

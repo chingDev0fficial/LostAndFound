@@ -63,19 +63,8 @@
                             <label for="category" class="form-label">Category *</label>
                             <select class="form-select" id="category" name="category" required>
                                 <option value="" disabled selected>Select an item category</option>
-                                <option value="stationery">Stationery (pens, pencils, etc.)</option>
-                                <option value="notebooks">Notebooks / Textbooks</option>
-                                <option value="bags">Bags / Backpacks</option>
-                                <option value="clothing">Clothing (jackets, hoodies, uniforms)</option>
-                                <option value="footwear">Footwear (shoes, sandals)</option>
-                                <option value="water_bottle">Water Bottles</option>
-                                <option value="lunch_box">Lunch Boxes</option>
-                                <option value="eyeglasses">Eyeglasses</option>
-                                <option value="electronics">Electronics (phones, earbuds, USB drives)</option>
-                                <option value="sports_equipment">Sports Equipment</option>
-                                <option value="art_supplies">Art Supplies</option>
-                                <option value="accessories">Accessories (watches, jewelry)</option>
-                                <option value="id_cards">ID Cards / Bus Passes</option>
+                            <option value="stationery">Stationery</option>
+                            <option value="electronics">Electronics</option>
                             </select>
                         </div>
                     </div>
@@ -170,13 +159,10 @@
                         <label for="predictedCategory" class="form-label">Predicted Category</label>
                         <select class="form-select" id="predictedCategory" name="predicted-category" required>
                             <option value="">Analyzing image...</option>
+                            <option value="stationery">Stationery</option>
                             <option value="electronics">Electronics</option>
-                            <option value="clothing">Clothing</option>
-                            <option value="documents">Documents</option>
-                            <option value="accessories">Accessories</option>
-                            <option value="other">Other</option>
                         </select>
-                        <div id="mlConfidence" class="form-text"></div>
+                        <div id="mlConfidence-cat" class="form-text"></div>
                     </div>
 
                     <!-- Item Details -->
@@ -185,7 +171,8 @@
                     </div>
                     <div class="mb-3">
                         <label for="itemName" class="form-label">Item Name</label>
-                        <input type="text" class="form-control" id="itemName" name="item-name">
+                        <input type="text" class="form-control" id="foundItemName" name="item-name">
+                        <div id="mlConfidence-item" class="form-text"></div>
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
