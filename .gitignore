@@ -5,6 +5,8 @@ env/
 
 # Media
 media/
+mediafiles/
+staticfiles/
 
 # Python
 __pycache__/

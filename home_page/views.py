@@ -26,8 +26,10 @@ def contact(request):
 def item_lost_report(request):
     if request.method == 'POST':
         try:
-            process_lost_item(request)
+            result = process_lost_item(request)
+            print(result)
             return JsonResponse({
+                'result': result,
                 'success': True,
                 'message': 'Successfully Submitted the Form'
             })
@@ -43,9 +45,10 @@ def item_lost_report(request):
 def item_found_report(request):
     if request.method == 'POST':
         try:
-            process_found_item(request)
+            result = process_found_item(request)
             
             return JsonResponse({
+                'result': result,
                 'success': True,
                 'message': 'Found item report submitted successfully'
             })
@@ -75,8 +78,8 @@ def recognize_image(request):
         img = img.resize((224, 224))  # Resize to model input size
         
         # Load model and get prediction
-        model, optimizer, scheduler = load_model(Path(__file__).parent / 
-                                                'ml_models' / 
+        model, optimizer, scheduler = load_model(Path(__file__).parent.parent / 
+                                                'ml_services' / 'ml_models' / 
                                                 'model_checkpoint.pth')
         
         # Convert PIL image to tensor and get prediction

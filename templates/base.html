@@ -6,36 +6,55 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{% endblock %}</title>
     {% block extra_css %}{% endblock %}
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+
+        body {
+            background-image: url("{% static 'img/bg.png' %}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            min-height: 100vh;
+        }
+        @media screen and (max-width: 768px) {
+            body {
+                background-image: url("{% static 'img/bg-phone.gif' %}");
+                background-size: 100% auto;
+                background-position: top center;
+                width: 100%;
+                min-height: 100vh;
+                background-attachment: fixed;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            body {
+                background-size: 100% auto;
+            }
+        }
+
+        /* @media screen and (min-width: 1024px) and (max-width: 1366px) {
+            body {
+                background-size: 100% 100%;
+                background-position: center;
+                min-height: 100vh;
+                width: 100%;
+            }
+        } */
+    </style>
 </head>
-<body id="animation-background">
-
+<body>
+    <!-- id="animation-background" -->
     {% block navbar %}
-    {% endblock %}
-
-    
-    {% block background %}
     {% endblock %}
 
     {% block content %}
     {% endblock %}
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.globe.min.js"></script>
-    <script>
-        VANTA.GLOBE({
-          el: "#animation-background",
-          mouseControls: false,
-          touchControls: true,
-          gyroControls: false,
-          minHeight: 200.00,
-          minWidth: 200.00,
-          scale: 1.00,
-          scaleMobile: 1.00,
-          color: 0x8e408e,
-          color2: 0xfc0000,
-          backgroundColor: 0xffffff
-        })
-    </script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>
