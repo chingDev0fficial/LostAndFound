@@ -6,6 +6,7 @@ torchvision==0.15.2
 python-multipart==0.0.6
 pillow==9.5.0
 twilio>=7.18.0
+tensorflow>=2.8.0
 sentence-transformers>=2.2.0
 scikit-learn>=1.0.2
 Pillow>=9.0.0
