@@ -2,11 +2,13 @@ import numpy as np
 import torch
 import torch.nn as nn
 from twilio.rest import Client
-from .models import LostItem, FoundItem
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.applications import ResNet50
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
+from torchvision import models
+import io
+import requests
 
 class NeuralNetwork(nn.Module):
     def __init__(self, input_size, hidden_size, num_categories, num_items):  # Include all parameters
@@ -32,7 +34,10 @@ class NeuralNetwork(nn.Module):
 
 # Load the model
 def load_model(path):
-    checkpoint = torch.load(path, map_location=torch.device('cpu'))
+    # checkpoint = torch.load(path, map_location=torch.device('cpu'))
+    checkpoint = torch.load(path, map_location='cpu')
+    print(f'Model: {checkpoint}')
+    # checkpoint.eval()
 
     # Use the saved architecture parameters
     input_size = checkpoint['input_size']
@@ -40,7 +45,7 @@ def load_model(path):
     num_categories = checkpoint['num_categories']
     num_items = checkpoint['num_items']
 
-    print(f"Hidden Size {checkpoint['hidden_size']}")
+    # print(f"Hidden Size {checkpoint['hidden_size']}")
 
     # Rebuild the model exactly as trained
     model = NeuralNetwork(input_size, hidden_size, num_categories, num_items)
@@ -53,6 +58,25 @@ def load_model(path):
 
     model.eval()  # Set to eval mode for inference
     return model, optimizer, scheduler
+
+# def load_model(file_id, map_location='cpu'):
+#     # Build direct download URL from file ID
+#     url = f"https://drive.google.com/uc?export=download&id={file_id}"
+
+#     response = requests.get(url)
+#     print(f"Response {response}")
+#     if response.status_code != 200:
+#         raise Exception("Failed to fetch model from Google Drive")
+
+#     # Wrap content in BytesIO and load using torch
+#     buffer = io.BytesIO(response.content)
+#     print(f"Buffer {buffer}")
+#     model, optimizer, scheduler = torch.load(buffer, map_location=map_location, weights_only=False)
+#     print(f"Model {model}")
+#     print(f"Optimizer {optimizer}")
+#     print(f"Scheduler {scheduler}")
+#     model.eval()
+#     return model, optimizer, scheduler
 
 # Example usage:
 # model, optimizer, scheduler = load_model('model_checkpoint.pth')
