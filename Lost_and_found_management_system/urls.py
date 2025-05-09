@@ -21,6 +21,7 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('super-admin/', admin.site.urls),
     path('', include('home_page.urls')),
+    path('admin/', include('admin_auth.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

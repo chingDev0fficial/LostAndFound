@@ -5,6 +5,8 @@ env/
 
 # Media
 media/
+mediafiles/
+staticfiles/
 
 # Python
 __pycache__/
@@ -36,3 +38,4 @@ build/
 # System files
 .DS_Store
 Thumbs.db
+db.sqlite3

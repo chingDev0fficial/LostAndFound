@@ -7,10 +7,21 @@ from django.core.files.base import ContentFile
 from .ml_services import load_model
 from pathlib import Path
 import os
-import io
+import torch
 from PIL import Image
 from torchvision import transforms
-import torch
+from huggingface_hub import hf_hub_download
+
+HF_TOKEN = os.getenv("HF_TOKEN")
+
+REPO_ID = repo_id="chingDev/item-recognizer"
+FILE_NAME = 'model_checkpoint.pth'
+
+MODEL_PATH = hf_hub_download(
+    repo_id=REPO_ID,
+    filename=FILE_NAME,
+    token=HF_TOKEN
+)
 
 # Create your views here.
 def home(request):
@@ -26,8 +37,10 @@ def contact(request):
 def item_lost_report(request):
     if request.method == 'POST':
         try:
-            process_lost_item(request)
+            result = process_lost_item(request)
+            print(result)
             return JsonResponse({
+                'result': result,
                 'success': True,
                 'message': 'Successfully Submitted the Form'
             })
@@ -43,9 +56,10 @@ def item_lost_report(request):
 def item_found_report(request):
     if request.method == 'POST':
         try:
-            process_found_item(request)
+            result = process_found_item(request)
             
             return JsonResponse({
+                'result': result,
                 'success': True,
                 'message': 'Found item report submitted successfully'
             })
@@ -63,7 +77,7 @@ def recognize_image(request):
     #                                          'ml_models' / 
     #                                          'model_checkpoint.pth')
     
-    # model.eval()
+    # model, optimizer, scheduler = load_model('1PWzIlXi3OMSZo200h5mTpI4J3GaeEM6r')
     # print(f'request {request.FILES.get("image")}')
     image_file = request.FILES['image']
     temp_path = os.path.join('temp', image_file.name)
@@ -75,10 +89,12 @@ def recognize_image(request):
         img = img.resize((224, 224))  # Resize to model input size
         
         # Load model and get prediction
-        model, optimizer, scheduler = load_model(Path(__file__).parent / 
-                                                'ml_models' / 
-                                                'model_checkpoint.pth')
+        # model, optimizer, scheduler = load_model(Path(__file__).parent.parent / 
+        #                                         'ml_services' / 'ml_models' / 
+        #                                         'model_checkpoint.pth')
+        model, optimizer, scheduler = load_model(MODEL_PATH)
         
+
         # Convert PIL image to tensor and get prediction
         transform = transforms.Compose([
             transforms.Resize((28, 28)),  # Resize images to consistent size

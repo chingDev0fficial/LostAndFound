@@ -1,0 +1,52 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %}</title>
+    {% block extra_css %}{% endblock %}
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+
+        body {
+            background-image: url("{% static 'img/admin-bg.jpg' %}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            min-height: 100vh;
+        }
+
+        @media screen and (max-width: 768px) {
+            body {
+                background-image: url("{% static 'img/admin-bg-phone.jpg' %}");
+                background-size: 100% auto;
+                background-position: top center;
+                width: 100%;
+                min-height: 100vh;
+                background-attachment: fixed;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            body {
+                background-size: 100% auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- id="animation-background" -->
+    {% block navbar %}
+    {% endblock %}
+
+    {% block content %}
+    {% endblock %}
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

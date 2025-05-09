@@ -45,10 +45,10 @@ class FoundItem(models.Model):
     ]
 
     # Item Information
-    item_image = models.ImageField(upload_to='found_items/')
-    predicted_category = models.CharField(max_length=50, choices=CATEGORY_CHOICES)
+    image = models.ImageField(upload_to='found_items/')
+    category = models.CharField(max_length=50, choices=CATEGORY_CHOICES)
     item_name = models.CharField(max_length=100, blank=True)
-    location_found = models.CharField(max_length=200)
+    location = models.CharField(max_length=200)
     date_found = models.DateField()
     time_found = models.TimeField()
     description = models.TextField(blank=True)
@@ -64,4 +64,4 @@ class FoundItem(models.Model):
     ml_confidence = models.FloatField(default=0.0)  # Store ML prediction confidence
 
     def __str__(self):
-        return f"{self.predicted_category} - Found by {self.finder_name}"
+        return f"{self.category} - Found by {self.finder_name}"

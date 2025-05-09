@@ -3,8 +3,8 @@ from .models import LostItem, FoundItem
 # Register your models here.
 @admin.register(FoundItem)
 class FoundItemAdmin(admin.ModelAdmin):
-    list_display = ('item_name', 'predicted_category', 'location_found', 'date_found', 'finder_name')
-    list_filter = ('predicted_category', 'date_found')
+    list_display = ('item_name', 'category', 'location', 'date_found', 'finder_name')
+    list_filter = ('category', 'date_found')
     search_fields = ('item_name', 'description', 'finder_name')
     date_hierarchy = 'date_found'
 
