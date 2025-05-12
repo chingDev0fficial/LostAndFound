@@ -1,0 +1,92 @@
+{% extends 'admin_base.html' %}
+{% load static %}
+
+{% block title %}Admin Panel{% endblock %}
+
+{% block extra_css%}
+<link rel="stylesheet" href="{% static 'css/admin_base.css' %}">
+{% endblock %}
+
+{% block navbar %}
+<nav class="sidebar">
+    <div class="logos">
+        <img src="{% static 'img/snsu-logo.png' %}" alt="">
+        <img src="{% static 'img/usc-logo2.png' %}" alt="">
+    </div>
+    <a href="{% url 'administrator:admin_home' %}">Dashboard</a>
+    <a href="#">Manage Admins</a>
+    <a href="{% url 'administrator:manage_matched_items' %}">Manage Items</a>
+    <a href="#">Reports</a>
+    <a href="#">Settings</a>
+    <a href="{% url 'admin_auth:login' %}">Logout</a>
+</nav>
+
+<div class="navbar">
+    <h2>Welcome, {{ request.session.name }}</h2>
+    <img src="" alt="admin picture">
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="content">
+    <div class="dashboard">
+        <h1>Admin Dashboard</h1>
+        <div class="cards">
+            <div class="card">
+                <p id="total-matched-report">Processing...</p>
+                <p>Total Matched</p>
+            </div>
+            <div class="card">
+                <p id="total-found-report">Processing...</p>
+                <p>Total Found</p>
+            </div>
+            <div class="card">
+                <p id="total-lost-report">Processing...</p>
+                <p>Total Lost</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="visualizations">
+        <h2>Data Overview</h2>
+        <div class="progress-bars">
+            <div class="progress-bar">
+                <p>Total Matched</p>
+                <div class="bar">
+                    <div id="matched-progress" class="fill" style="width: 0%;">0%</div>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <p>Total Found</p>
+                <div class="bar">
+                    <div id="found-progress" class="fill" style="width: 0%;">0%</div>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <p>Total Lost</p>
+                <div class="bar">
+                    <div id="lost-progress" class="fill" style="width: 0%;">0%</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="charts">
+            <!-- add a barchart of which category is being lost -->
+            <div class="chart-container barchart">
+                <h3>Lost Items by Category</h3>
+                <canvas id="lostCategoryChart"></canvas>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="dataChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{% static 'js/get_reports.js' %}"></script>
+<script src="{% static 'js/chart.js' %}"></script>
+{% endblock %}

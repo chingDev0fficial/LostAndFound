@@ -1,0 +1,31 @@
+{% extends 'admin_base.html' %}
+{% load static %}
+
+{% block title %}Admin Panel{% endblock %}
+
+{% block extra_css%}
+<link rel="stylesheet" href="{% static 'css/admin_base.css' %}">
+{% endblock %}
+
+{% block navbar %}
+<nav class="sidebar">
+    <div class="logos">
+        <img src="{% static 'img/snsu-logo.png' %}" alt="">
+        <img src="{% static 'img/usc-logo2.png' %}" alt="">
+    </div>
+    <a href="{% url 'administrator:admin_home' %}">Dashboard</a>
+    <a href="#">Manage Admins</a>
+    <a href="{% url 'administrator:manage_matched_items' %}">Manage Items</a>
+    <a href="#">Reports</a>
+    <a href="#">Settings</a>
+    <a href="{% url 'admin_auth:login' %}">Logout</a>
+</nav>
+
+<div class="navbar">
+    <h2>Welcome, {{ request.session.name }}</h2>
+    <img src="" alt="admin picture">
+</div>
+{% endblock %}
+
+{% block content %}
+{% endblock %}
