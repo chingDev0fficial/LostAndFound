@@ -94,6 +94,12 @@ MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
+# Add these settings after your MIDDLEWARE configuration
+# SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+# SESSION_COOKIE_AGE = 1209600  # 2 weeks in seconds
+# SESSION_COOKIE_SECURE = False  # Set to True if using HTTPS
+# SESSION_COOKIE_NAME = 'sessionid'
+
 ROOT_URLCONF = 'Lost_and_found_management_system.urls'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
