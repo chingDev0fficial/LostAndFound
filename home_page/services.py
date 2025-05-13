@@ -1,9 +1,24 @@
 from django.conf import settings
-from .models import LostItem, FoundItem
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
+from .models import LostItem, FoundItem, MatchedItem
 from .ml_services import ItemMatcher
 from django.core.mail import send_mail
 from django.views.decorators.csrf import csrf_exempt
 from sentence_transformers import SentenceTransformer
+
+def notify_admin_dashboard():
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(
+        'reports',  # Group name
+        {
+            'type': 'send_report_update',
+            'message': 'Updated counts',
+            'total_found': FoundItem.objects.count(),
+            'total_lost': LostItem.objects.count(),
+            'total_matched': MatchedItem.objects.count(),
+        }
+    )
 
 @csrf_exempt
 def process_lost_item(request):
@@ -33,6 +48,8 @@ def process_lost_item(request):
         )
         lost_item.save()
 
+        notify_admin_dashboard()
+
         # Check for matches in lost items
         matcher = ItemMatcher()
         potential_matches = matcher.match_items(
@@ -41,17 +58,35 @@ def process_lost_item(request):
             threshold=0.7
         )
 
-        print(f'Potential Matches {potential_matches}')
+        if potential_matches:
+            print(f'Processing potential matches: {potential_matches}')
+            match = potential_matches[0]
+            found_item = match['found_matched']
 
-        # Send notifications for matches
-        for match in potential_matches:
+            # Update statuses
+            lost_item.status = 'matched'
+            found_item.status = 'matched'
+            lost_item.save()
+            found_item.save()
+
+            # Store the match in MatchedItem
+            matched_item = MatchedItem(
+                lost_item=lost_item,
+                found_item=found_item,
+                matched_by="System",
+                confidence_score=match['similarity'] * 100
+            )
+            matched_item.save()
+            notify_admin_dashboard()
+
+            print(f'Matched Item: {matched_item}')
+
+            # Send notifications
             send_match_notification(
                 lost_item,
-                match['found_item'],
+                found_item,
                 match['similarity'] * 100
             )
-
-        print('Message Sent')
 
         return {
             'success': True,
@@ -88,19 +123,48 @@ def process_found_item(request):
         )
         found_item.save()
 
+        notify_admin_dashboard()
+
         # Check for matches in lost items
         matcher = ItemMatcher()
         potential_matches = matcher.match_items(
             found_item,
-            LostItem.objects.filter(status='pending'),
-            threshold=0.7
+            LostItem.objects.filter(status='pending')
         )
 
-        # Send notifications for matches
-        for match in potential_matches:
+        print(f'Potential Matches: {True if potential_matches else False}')
+
+        if potential_matches:
+            print(f'Processing potential matches: {potential_matches}')
+            match = potential_matches[0]
+            lost_item = match['found_matched']
+
+            # Update statuses
+            found_item.status = 'matched'
+            lost_item.status = 'matched'
+            found_item.save()
+            lost_item.save()
+
+            print(f'Found Item: {found_item}')
+            print(f'Lost Item: {lost_item}')
+
+            # Store the match in MatchedItem
+            matched_item = MatchedItem(
+                lost_item=lost_item,
+                found_item=found_item,
+                matched_by="System",
+                confidence_score=match['similarity'] * 100
+            )
+            matched_item.save()
+
+            notify_admin_dashboard()
+
+            print(f'Matched Item: {matched_item}')
+
+            # Send notifications
             send_match_notification(
                 found_item,
-                match['found_item'],
+                lost_item,
                 match['similarity'] * 100
             )
 

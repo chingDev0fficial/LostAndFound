@@ -3,15 +3,12 @@ from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 
 class Admin(AbstractUser):
-    ROLE_CHOICES = [
-        ('super_admin', 'Super Admin'),
-        ('verifier', 'Verifier'),
-        ('communicator', 'Communicator'),
-    ]
-
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='verifier')
     profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
+    username = models.CharField(max_length=150, unique=True)
+    password = models.CharField(max_length=128)
+    email = models.EmailField(unique=True)
     contact_number = models.CharField(max_length=20, blank=True)
+    is_active = models.BooleanField(default=True)
     last_login = models.DateTimeField(null=True, blank=True)
     date_joined = models.DateTimeField(default=timezone.now)
 

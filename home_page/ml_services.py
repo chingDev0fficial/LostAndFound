@@ -6,9 +6,13 @@ from tensorflow.keras.preprocessing import image
 from tensorflow.keras.applications import ResNet50
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
-from torchvision import models
-import io
-import requests
+# from keybert import KeyBERT
+# from nltk.tokenize import word_tokenize
+# from nltk.corpus import stopwords
+# from nltk import pos_tag
+# from fuzzywuzzy import fuzz
+# import re
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 class NeuralNetwork(nn.Module):
     def __init__(self, input_size, hidden_size, num_categories, num_items):  # Include all parameters
@@ -18,7 +22,7 @@ class NeuralNetwork(nn.Module):
             nn.Linear(input_size, hidden_size),   # 0
             nn.ReLU(),                            # 1
             nn.Dropout(0.3),                      # 2
-            nn.Linear(hidden_size, hidden_size), # 3
+            nn.Linear(hidden_size, hidden_size),  # 3
             nn.ReLU(),                            # 4
             nn.Dropout(0.3)
         )
@@ -97,37 +101,36 @@ class ItemMatcher:
     def __init__(self):
         # Initialize pre-trained models
         self.image_model = ResNet50(weights='imagenet', include_top=False, pooling='avg')
-        self.text_model = SentenceTransformer('paraphrase-MiniLM-L6-v2')
-        
-    def match_items(self, lost_item, found_items, threshold=0.7):
-        matches = []
+        # self.text_model = SentenceTransformer('paraphrase-MiniLM-L6-v2')
+        # self.text_model_advanced = SentenceTransformer('paraphrase-mpnet-base-v2', cache_folder='./model_cache')
+        # self.keyword_model = KeyBERT(model=self.text_model)
+        # self.stop_words = set(stopwords.words('english'))
+        # self.important_pos = {'NN', 'NNS', 'NNP', 'NNPS', 'JJ'}  # Nouns and adjectives
 
-        print(f'Matches: {matches}')
+    def match_items(self, lost_item, found_items, threshold=0.6):
+        matches = []
         
         for found_item in found_items:
             similarity_score = self._calculate_similarity(lost_item, found_item)
+            print(f"Similarity score between '{lost_item.item_name}' and '{found_item.item_name}': {similarity_score}")
             if similarity_score >= threshold:
                 matches.append({
-                    'found_item': found_item,
+                    'found_matched': found_item,
                     'similarity': similarity_score
                 })
-
-        print(f'Matches: {matches}')
         
         return sorted(matches, key=lambda x: x['similarity'], reverse=True)
     
     def _calculate_similarity(self, lost_item, found_item):
         scores = []
 
-        print('Calculating Similarity...')
+        print(scores)
         
         # Category similarity (exact match)
         if lost_item.category == found_item.category:
             scores.append(1.0)
         else:
             scores.append(0.0)
-
-        print('checling category...')
             
         # Image similarity
         if lost_item.image and found_item.image:
@@ -135,21 +138,19 @@ class ItemMatcher:
             scores.append(img_score)
             
         # Text similarity
+        print('text score')
         text_score = self._compare_descriptions(lost_item, found_item)
         scores.append(text_score)
 
-        print(f'Score {scores}')
+        print(f"Scores: {scores}")
         
         # Weight and combine scores
         weights = [0.3, 0.4, 0.3] if lost_item.image and found_item.image else [0.3, 0.3] # Category, Image, Text weights
         final_score = sum(s * w for s, w in zip(scores, weights)) / sum(weights)
-
-        print(f'Final Score {final_score}')
         
         return final_score
     
     def _compare_images(self, img1_path, img2_path):
-        print('Comparing Image..')
         try:
             # Extract features from both images
             feat1 = self._extract_image_features(img1_path)
@@ -163,31 +164,120 @@ class ItemMatcher:
             return 0.0
     
     def _extract_image_features(self, img_path):
-        print('Extracting Features in image...')
         img = image.load_img(img_path, target_size=(224, 224))
         x = image.img_to_array(img)
         x = np.expand_dims(x, axis=0)
         features = self.image_model.predict(x, verbose=0)
         return features.flatten()
     
+    # def _extract_keywords(self, text):
+    #     return text
+        # Tokenize and tag parts of speech
+        # print(f'Keyword Extraction')
+        # print(f'Text {text}')
+        # tokens = word_tokenize(text.lower())
+        # print(f'Tokens {tokens}')
+        # tagged = pos_tag(tokens)
+        # print(f'Tagged {tagged}')
+        
+        # # Extract important words (nouns and adjectives)
+        # keywords = [word for word, pos in tagged 
+        #            if pos in self.important_pos 
+        #            and word not in self.stop_words]
+        # print(f'Keywords {keywords}')
+        # return keywords
+    
+    # def _compare_descriptions(self, lost_item, found_item):
+    #     lost_text = f"{lost_item.item_name} {lost_item.description}"
+    #     found_text = f"{found_item.item_name} {found_item.description}"
+
+    #     print(f'Lost Text {lost_text}')
+    #     print(f'Found Text {found_text}')
+        
+    #     # Get embeddings
+    #     lost_embedding = self.text_model.encode([lost_text])[0]
+    #     found_embedding = self.text_model.encode([found_text])[0]
+    #     # lost_embedding_advanced = self.text_model_advanced.encode([lost_text])[0]
+    #     # found_embedding_advanced = self.text_model_advanced.encode([found_text])[0]
+
+    #     # Calculate similarity
+    #     similarity = cosine_similarity(
+    #         lost_embedding.reshape(1, -1), 
+    #         found_embedding.reshape(1, -1)
+    #     )[0][0]
+
+    #     # similarity_advanced = cosine_similarity(
+    #     #     lost_embedding_advanced.reshape(1, -1), 
+    #     #     found_embedding_advanced.reshape(1, -1)
+    #     # )[0][0]
+        
+    #     return float(similarity)
     def _compare_descriptions(self, lost_item, found_item):
-        print('Comparing Description...')
         lost_text = f"{lost_item.item_name} {lost_item.description}"
         found_text = f"{found_item.item_name} {found_item.description}"
+        descriptions = [lost_text, found_text]
 
-        print(f'Lost Text {lost_text}')
-        print(f'Found Text {found_text}')
-        
-        # Get embeddings
-        lost_embedding = self.text_model.encode([lost_text])[0]
-        found_embedding = self.text_model.encode([found_text])[0]
-        
-        # Calculate similarity
-        similarity = cosine_similarity(
-            lost_embedding.reshape(1, -1), 
-            found_embedding.reshape(1, -1)
-        )[0][0]
+        vectorizer = TfidfVectorizer(stop_words='english')
+        tfidf = vectorizer.fit_transform(descriptions)
 
-        print(f'Similarity {similarity}')
+        similarity = cosine_similarity(tfidf[0:1], tfidf[1:2])
+        return float(similarity[0][0])
+        # # Get embeddings for semantic similarity
+        # lost_embedding = self.text_model.encode([lost_text])[0]
+        # found_embedding = self.text_model.encode([found_text])[0]
+        # # Calculate semantic similarity
+        # semantic_sim = float(cosine_similarity(
+        #     lost_embedding.reshape(1, -1), 
+        #     found_embedding.reshape(1, -1)
+        # )[0][0])
+
+        # # Extract keywords
+        # lost_keywords = self._extract_keywords(lost_text)
+        # found_keywords = self._extract_keywords(found_text)
+
+        # # Calculate keyword matching score
+        # keyword_matches = 0
+        # total_keywords = len(lost_keywords)
         
-        return float(similarity)
+        # for lost_word in lost_keywords:
+        #     best_match = max([fuzz.ratio(lost_word, found_word) for found_word in found_keywords], default=0)
+        #     if best_match > 80:  # 80% similarity threshold for fuzzy matching
+        #         keyword_matches += 1
+
+        # keyword_sim = keyword_matches / total_keywords if total_keywords > 0 else 0
+        # # Check for negative patterns (contradictions)
+        # negative_patterns = [
+        #     (r'different color', r'color: (\w+)'),
+        #     (r'not working', r'working condition'),
+        #     (r'broken', r'good condition')
+        # ]
+        
+        # contradiction_penalty = 0
+        # for pattern, opposing in negative_patterns:
+        #     if (re.search(pattern, lost_text.lower()) and re.search(opposing, found_text.lower())) or \
+        #        (re.search(pattern, found_text.lower()) and re.search(opposing, lost_text.lower())):
+        #         contradiction_penalty += 0.3
+
+        # print(f'Contradiction Penalty {contradiction_penalty}')
+
+        # # Combined score with weights
+        # weights = {
+        #     'semantic': 0.4,
+        #     'keyword': 0.4,
+        #     'contradiction': 0.2
+        # }
+        
+        # final_score = (
+        #     (semantic_sim * weights['semantic']) +
+        #     (keyword_sim * weights['keyword']) -
+        #     (contradiction_penalty * weights['contradiction'])
+        # )
+
+        # print(f'Final Score {final_score}')
+
+        # # Ensure score is between 0 and 1
+        # final_score = max(0, min(1, final_score))
+
+        # print(f'Final Score (clamped) {final_score}')
+        
+        # return final_score

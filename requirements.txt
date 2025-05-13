@@ -1,7 +1,7 @@
 django>=5.0.4
 fastapi==0.110.0
 uvicorn==0.29.0
-torch==2.3.0
+torch==2.7.0
 torchvision==0.18.0
 python-multipart==0.0.9
 pillow==10.3.0
@@ -22,3 +22,15 @@ huggingface_hub>=0.23.2
 dj-database-url>=2.1.0
 python-dotenv>=1.0.1
 numpy<2
+
+channels==3.0.5
+channels_redis
+
+daphne
+uvicorn
+
+nltk
+fuzzywuzzy
+python-Levenshtein
+
+keybert
